@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Personel Kayıt</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+  <h2>Yeni Personel</h2>
+  <form id="personelForm">
+    <input class="form-control my-2" id="ad" placeholder="Ad" required>
+    <input class="form-control my-2" id="soyad" placeholder="Soyad" required>
+    <input class="form-control my-2" id="pozisyon" placeholder="Pozisyon" required>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+  </form>
+
+  <h3 class="mt-5">Personel Listesi</h3>
+  <ul class="list-group" id="personelListesi"></ul>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    const API_BASE = "http://localhost:9090";
+
+    function listele() {
+      $.get(`${API_BASE}/api/personel`, function(data) {
+        $('#personelListesi').empty();
+        data.forEach(p => {
+          $('#personelListesi').append(`<li class="list-group-item">${p.ad} ${p.soyad} - ${p.pozisyon}</li>`);
+        });
+      });
+    }
+
+    $('#personelForm').on('submit', function(e) {
+      e.preventDefault();
+
+      const yeniPersonel = {
+        ad: $('#ad').val(),
+        soyad: $('#soyad').val(),
+        pozisyon: $('#pozisyon').val()
+      };
+
+      $.ajax({
+        url: `${API_BASE}/api/personel`,
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(yeniPersonel),
+        success: function() {
+          listele(); // Yeni listeyi getir
+          $('#personelForm')[0].reset(); // Formu temizle
+        },
+        error: function() {
+          alert("Kayıt başarısız oldu.");
+        }
+      });
+    });
+
+    listele(); // Sayfa ilk açıldığında listele
+  </script>
+</body>
+</html>
